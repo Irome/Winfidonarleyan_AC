@@ -1,46 +1,43 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ */
+
 #include "WhoListCache.h"
 #include "World.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "GuildMgr.h"
 
-std::vector<WhoListPlayerInfo> WhoListCacheMgr::m_whoOpcodeList;
-
-void WhoListCacheMgr::Update()
+void WhoListStorageMgr::Update()
 {
     // clear current list
-    m_whoOpcodeList.clear();
-    m_whoOpcodeList.reserve(sWorld->GetPlayerCount()+1);
+    _whoListStorage.clear();
+    _whoListStorage.reserve(sWorld->GetPlayerCount() + 1);
 
-    TRINITY_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
-    HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
+    HashMapHolder<Player>::MapType const& m = ObjectAccessor::GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
         if (!itr->second->FindMap() || itr->second->GetSession()->PlayerLoading())
             continue;
 
-        if (itr->second->GetSession()->GetSecurity() > SEC_PLAYER)
+        std::string playerName = itr->second->GetName();
+        std::wstring widePlayerName;
+        if (!Utf8toWStr(playerName, widePlayerName))
             continue;
 
-        std::string pname = itr->second->GetName();
-        std::wstring wpname;
-        if (!Utf8toWStr(pname, wpname))
+        wstrToLower(widePlayerName);
+
+        std::string guildName = sGuildMgr->GetGuildNameById(itr->second->GetGuildId());
+        std::wstring wideGuildName;
+        if (!Utf8toWStr(guildName, wideGuildName))
             continue;
-        wstrToLower(wpname);
 
-        std::string gname = sGuildMgr->GetGuildNameById(itr->second->GetGuildId());
-        std::wstring wgname;
-        if (!Utf8toWStr(gname, wgname))
-            continue;
-        wstrToLower(wgname);
+        wstrToLower(wideGuildName);
 
-        std::string aname;
-        if (AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(itr->second->GetZoneId()))
-            aname = areaEntry->area_name[sWorld->GetDefaultDbcLocale()];
-
-        if (itr->second->IsSpectator())
-            aname = "Dalaran";
-
-        m_whoOpcodeList.push_back( WhoListPlayerInfo(itr->second->GetTeamId(), itr->second->GetSession()->GetSecurity(), itr->second->getLevel(), itr->second->getClass(), itr->second->getRace(), (itr->second->IsSpectator() ? 4395 /*Dalaran*/ : itr->second->GetZoneId()), itr->second->getGender(), wpname, wgname, aname, pname, gname) );
+        _whoListStorage.emplace_back(itr->second->GetGUID(), itr->second->GetTeamId(), itr->second->GetSession()->GetSecurity(), itr->second->getLevel(),
+            itr->second->getClass(), itr->second->getRace(), itr->second->GetZoneId(), itr->second->getGender(), itr->second->IsVisible(),
+            widePlayerName, wideGuildName, playerName, guildName);
     }
 }
