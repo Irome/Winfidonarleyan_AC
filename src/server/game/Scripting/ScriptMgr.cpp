@@ -2061,6 +2061,11 @@ void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
     FOREACH_SCRIPT(SpellSC)->OnCalcMaxDuration(aura, maxDuration);
 }
 
+void ScriptMgr::OnBeforeShapeshiftBoosts(AuraEffect const* auraEffect, Unit* target, uint32& spellId, uint32& spellId2, uint32& HotWSpellId, bool apply)
+{
+    FOREACH_SCRIPT(SpellSC)->OnBeforeShapeshiftBoosts(auraEffect, target, spellId, spellId2, HotWSpellId, apply);
+}
+
 void ScriptMgr::OnGameEventStart(uint16 EventID)
 {
 #ifdef ELUNA

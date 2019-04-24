@@ -1167,6 +1167,8 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
     //uint32 spellId3 = 0;
     uint32 HotWSpellId = 0;
 
+    sScriptMgr->OnBeforeShapeshiftBoosts(this, target, spellId, spellId2, HotWSpellId, apply);
+ 
     switch (GetMiscValue())
     {
         case FORM_CAT:

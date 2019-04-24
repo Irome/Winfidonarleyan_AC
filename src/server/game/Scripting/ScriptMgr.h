@@ -1125,6 +1125,8 @@ public:
     // Calculate max duration in applying aura 
     virtual void OnCalcMaxDuration(Aura const* /*aura*/, int32& /*maxDuration*/) { }
 
+    // Shapeshift Boosts 
+    virtual void OnBeforeShapeshiftBoosts(AuraEffect const* /*auraEffect*/, Unit* /*target*/, uint32& /*spellId*/, uint32& /*spellId2*/, uint32& /*HotWSpellId*/, bool /*apply*/) { }
 };
 
 // this class can be used to be extended by Modules
@@ -1481,9 +1483,10 @@ class ScriptMgr
         void OnBattlegroundUpdate(Battleground* bg, uint32 diff);
         void OnBattlegroundAddPlayer(Battleground* bg, Player* player);
 
-    public: /* SpellSC */ 
+    public: /* SpellSC */
  
         void OnCalcMaxDuration(Aura const* aura, int32& maxDuration);
+        void OnBeforeShapeshiftBoosts(AuraEffect const* auraEffect, Unit* target, uint32& spellId, uint32& spellId2, uint32& HotWSpellId, bool apply);
 
     public: /* GameEventScript */
 
