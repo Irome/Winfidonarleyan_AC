@@ -1100,6 +1100,10 @@ class Player : public Unit, public GridObject<Player>
         void AddToWorld();
         void RemoveFromWorld();
 
+        BGData GetBGData() { return m_bgData; }
+        void SetBGData(BGData bgdata) { m_bgData = bgdata; }
+        void SetBGTeamID(TeamId teamid) { m_bgData.bgTeamId = teamid; }
+
         void SetObjectScale(float scale)
         {
             Unit::SetObjectScale(scale);
