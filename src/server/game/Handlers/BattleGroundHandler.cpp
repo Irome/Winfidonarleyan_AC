@@ -24,6 +24,10 @@
 #include "Group.h"
 #include "ScriptMgr.h"
 
+#ifdef KARGATUM_CFBG
+#include "KargatumCFBG.h"
+#endif
+
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recvData)
 {
     uint64 guid;
@@ -181,6 +185,14 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
         // no group or not a leader
         if (!grp || grp->GetLeaderGUID() != _player->GetGUID())
             return;
+
+#ifdef KARGATUM_CFBG
+        if (sCFBG->IsSystemEnable() && (grp->isRaidGroup() || grp->GetMembersCount() > 3))
+        {
+            ChatHandler(this).PSendSysMessage("For CFBG need max 3 players in group");
+            return;
+        }
+#endif
 
         // pussywizard: for party members - remove queues for which leader is not queued to!
         std::set<uint32> leaderQueueTypeIds;
