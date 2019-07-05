@@ -44,6 +44,9 @@ enum BattlegroundQueueGroupTypes
     BG_QUEUE_PREMADE_HORDE,
     BG_QUEUE_NORMAL_ALLIANCE,
     BG_QUEUE_NORMAL_HORDE,
+#ifdef _CFBG
+    BG_QUEUE_CFBG,
+#endif
 
     BG_QUEUE_MAX
 };
